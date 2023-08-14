@@ -4,11 +4,9 @@ const moviesController = require('./../Controllers/moviesController');
 const router = express.Router();
 
 // Will trigger if id is present in the route.
-router.param('id', moviesController.checkId);
-
 router.route('/')
     .get(moviesController.getAllMovies)
-    .post(moviesController.validateBody, moviesController.createNewMovie)
+    .post(moviesController.createNewMovie)
 
 router.route('/:id')
     .get(moviesController.getMovieById)
