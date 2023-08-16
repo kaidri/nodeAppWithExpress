@@ -1,9 +1,22 @@
 const Movie = require('./../Models/movieModel');
+const ApiFeatures = require('./../Utils/ApiFeatures');
+
+exports.getHighestRated = (req, res, next) => {
+    req.query.limit = '5';
+    req.query.sort = '-ratings'
+
+    next();
+}
 
 // Route handler functions -MIDDLEWARE-
 exports.getAllMovies = async (req, res) => {
     try{
-        const movies = await Movie.find();
+        const features = new ApiFeatures(Movie.find(), req.query)
+                        .sort()
+                        .filter()
+                        .limitFields()
+                        .paginate();
+        let movies = await features.query;
 
         res.status(200).json({
             status: 'Success',
@@ -93,5 +106,34 @@ exports.deleteMovieById = async (req, res) => {
             status: 'Failed',
             message: err.message
         });
+    }
+}
+
+exports.getMovieStats = async (req, res) => {
+    try{
+        const stats = await Movie.aggregate([
+            { $match: {ratings: {$gte: 7}}},
+            { $group: {
+                _id: null,
+                avgRating: { $avg: '$rating' },
+                avgPrice: { $avg: '$price' },
+                minPrice: { $min: '$price' },
+                maxPrice: { $max: '$price' },
+            }}
+        ]);
+
+        res.status(200).json({
+            status: 'Success',
+            count: stats.length,
+            data: {
+                stats
+            }
+        });
+    }
+    catch(err){
+        res.status(404).json({
+            status: "Failed",
+            message: err.message
+        })
     }
 }

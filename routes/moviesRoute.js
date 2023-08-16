@@ -3,6 +3,11 @@ const moviesController = require('./../Controllers/moviesController');
 
 const router = express.Router();
 
+router.route('/highest-rated')
+    .get(moviesController.getHighestRated, moviesController.getAllMovies);
+
+router.route('/movie-stats').get(moviesController.getMovieStats);
+
 // Will trigger if id is present in the route.
 router.route('/')
     .get(moviesController.getAllMovies)

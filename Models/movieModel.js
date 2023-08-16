@@ -16,7 +16,7 @@ const movieSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Duration is a required field.']
     },
-    rating: {
+    ratings: {
         type: Number
     },
     totalRating: {
@@ -31,7 +31,8 @@ const movieSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now(),
+        select: false
     },
     genres: {
         type: [String],
