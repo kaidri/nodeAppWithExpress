@@ -49,13 +49,13 @@ exports.createNewMovie = async (req, res) => {
             data: {
                 movie
             }
-        })
+        });
     }
     catch(err){
         res.status(400).json({
             status: 'Failed',
             message: err.message
-        })
+        });
     }
 }
 
@@ -68,17 +68,30 @@ exports.updateMovieById = async (req, res) => {
             data: {
                 movie: updatedMovie
             }
-        })
+        });
     }
     catch(err){
         res.status(404).json({
             status: 'Failed',
             message: err.message
-        })
+        });
     }
 
 }
 
-exports.deleteMovieById = (req, res) => {
+exports.deleteMovieById = async (req, res) => {
+    try{
+        const deletedMovie = await Movie.findByIdAndDelete(req.params.id);
 
+        res.status(204).json({
+            status: 'Success',
+            data: null
+        });
+    }
+    catch(err){
+        res.status(404).json({
+            status: 'Failed',
+            message: err.message
+        });
+    }
 }
