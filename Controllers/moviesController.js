@@ -112,14 +112,18 @@ exports.deleteMovieById = async (req, res) => {
 exports.getMovieStats = async (req, res) => {
     try{
         const stats = await Movie.aggregate([
-            { $match: {ratings: {$gte: 7}}},
+            { $match: {ratings: {$gte: 4.5}}},
             { $group: {
-                _id: null,
-                avgRating: { $avg: '$rating' },
+                _id: '$releaseYear',
+                avgRating: { $avg: '$ratings' },
                 avgPrice: { $avg: '$price' },
                 minPrice: { $min: '$price' },
                 maxPrice: { $max: '$price' },
-            }}
+                priceTotal: { $sum: '$price' },
+                movieCount: { $sum: 1},
+            }},
+            { $sort: { minPrice: 1}},
+            { $match: {maxPrice: {$gte: 60}}}
         ]);
 
         res.status(200).json({
@@ -134,6 +138,39 @@ exports.getMovieStats = async (req, res) => {
         res.status(404).json({
             status: "Failed",
             message: err.message
-        })
+        });
+    }
+}
+
+exports.getMovieByGenre = async (req, res) => {
+    try{
+        const genre = req.params.genre;
+        const movies = await Movie.aggregate([
+            { $unwind: '$genres'},
+            { $group: {
+                _id: '$genres',
+                movieCount: { $sum: 1},
+                movies: { $push: '$name'},
+                
+            }},
+            { $addFields: {genre: "$_id"}},
+            { $project: {_id: 0}},
+            { $sort: {movieCount: -1}},
+            { $match: {genre: genre}}
+        ]);
+
+        res.status(200).json({
+            status: 'Success',
+            count: movies.length,
+            data: {
+                movies
+            }
+        });
+    }
+    catch(err){
+        res.status(404).json({
+            status: "Failed",
+            message: err.message
+        });
     }
 }

@@ -8,6 +8,8 @@ router.route('/highest-rated')
 
 router.route('/movie-stats').get(moviesController.getMovieStats);
 
+router.route('/movie-by-genre/:genre').get(moviesController.getMovieByGenre);
+
 // Will trigger if id is present in the route.
 router.route('/')
     .get(moviesController.getAllMovies)
