@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
+const validator = require('validator');
 
 const movieSchema = new mongoose.Schema({
     name: {
@@ -8,7 +9,9 @@ const movieSchema = new mongoose.Schema({
         unique: true,
         maxlength: [100, 'Movie name must not have more than 100 characters'],
         minlength: [4 , 'Movie name must have at least 4 characters'],
-        trim: true
+        trim: true,
+        // Below is demonstration of the validator.js package isAlpha
+        //validate: [validator.isAlpha, "Name should only contain alphabetical letters"]
     },
     description: {
         type: String,
@@ -24,9 +27,9 @@ const movieSchema = new mongoose.Schema({
         validate: {
             validator: function(value){
             return value >= 1 && value <= 10;
-            // Will return true or false
+            // Will return true or false, 'this' keyword will only work on create, not on update.
         },
-        message: "Ratings should be above or equal to 1 and 10 or below"
+        message: "Ratings ({VALUE}) should be above or equal to 1 and 10 or below"
         },
     },
     totalRating: {
