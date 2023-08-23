@@ -28,4 +28,12 @@ app.use((req, res, next) => {
 // REFACTORED ROUTE HANDLERS
 app.use('/api/v1/movies', moviesRouter);
 
+// No matter the request method (get, post, delete) it'll return a default route with * route being all URL patterns. Should be used last.
+app.all('*', (req, res, next) => {
+    res.status(404).json({
+        status: "failed",
+        message: `Can't find ${req.originalUrl} on the server`
+    })
+});
+
 module.exports = app;
