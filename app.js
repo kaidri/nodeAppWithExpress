@@ -30,10 +30,27 @@ app.use('/api/v1/movies', moviesRouter);
 
 // No matter the request method (get, post, delete) it'll return a default route with * route being all URL patterns. Should be used last.
 app.all('*', (req, res, next) => {
-    res.status(404).json({
+    /* res.status(404).json({
         status: "failed",
         message: `Can't find ${req.originalUrl} on the server`
-    })
+    }) */
+
+    const err = new Error(`Can't find ${req.originalUrl} on the server`);
+    err.status = 'Failed';
+    err.statusCode = 404;
+    
+    next(err);
 });
+
+// Global error handling middleware
+app.use((error, req, res, next) => {
+    error.statusCode = error.statusCode || 500;
+    error.status = error.status || 'error';
+    res.status(error.statusCode).json({
+        status: error.statusCode,
+        message: error.message
+    });
+    next();
+})
 
 module.exports = app;
